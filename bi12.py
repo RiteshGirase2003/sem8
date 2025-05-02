@@ -3,8 +3,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_iris
 from sklearn.cluster import KMeans
+
+# PCA (Principal Component Analysis) in this context only for visualization, not for improving the clustering itself.
+# The Iris dataset has 4 features (sepal length, sepal width, petal length, petal width), meaning it's 4-dimensional.
+# We can't directly plot data in 4D, but we can reduce it to 2D using PCA while preserving as much of the variance (information) as possible.
+# PCA transforms the data to new axes (principal components) that capture the most important patterns in the data.
 from sklearn.decomposition import PCA  # For visualization
-from sklearn.preprocessing import StandardScaler
 
 # 📥 Step 1: Load the Iris dataset directly from sklearn
 iris = load_iris()
@@ -16,17 +20,15 @@ df = pd.DataFrame(X, columns=feature_names)
 print("Sample Data:")
 print(df.head())
 
-# ✨ Step 2: Scale the features to bring all features to the same scale
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+
 
 # 🔄 Step 3: Apply KMeans clustering (we know Iris has 3 classes)
 kmeans = KMeans(n_clusters=3, random_state=42)
-df['Cluster'] = kmeans.fit_predict(X_scaled)
+df['Cluster'] = kmeans.fit_predict(X)
 
 # 🧪 Step 4: Reduce dimensions to 2D using PCA for visualization
 pca = PCA(n_components=2)
-pca_result = pca.fit_transform(X_scaled)
+pca_result = pca.fit_transform(X)
 df['PCA1'] = pca_result[:, 0]
 df['PCA2'] = pca_result[:, 1]
 
