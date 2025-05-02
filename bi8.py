@@ -1,40 +1,42 @@
-# 📦 Import necessary libraries
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+from datetime import datetime
 
-# 📥 Step 1: Extract - Load the car evaluation data
-# File should be in the same directory as your notebook
-data = pd.read_csv('car_evaluation.csv', header=None)
+# -------------------------------
+# ✅ E - Extract Data from CSV Files
+# -------------------------------
 
-# Manually assign column names based on known dataset structure
-data.columns = ['buying', 'maint', 'doors', 'persons', 'lug_boot', 'safety', 'class']
+# Read the first CSV file
+df1 = pd.read_csv('etl1.csv')
 
-# Show the first few rows of the dataset
-print("Initial Extracted Data:")
-print(data.head())
+# Read the second CSV file
+df2 = pd.read_csv('etl2.csv')
 
-# 🔄 Step 2: Transform - Prepare the data for visualization
-# We'll analyze the distribution of car evaluation classes (e.g., unacc, acc, good, vgood)
+# -------------------------------
+# ✅ T - Transform Data
+# -------------------------------
 
-# Count how many records fall into each class
-class_counts = data['class'].value_counts().reset_index()
-class_counts.columns = ['class', 'count']
+# Standardize Date Format in both datasets
 
-print("\nTransformed Data (Class Distribution):")
-print(class_counts)
+# For df1: Convert to datetime (already in YYYY-MM-DD, but let's ensure it's the right format)
+df1['Date'] = pd.to_datetime(df1['Date'], format='%Y-%m-%d')
 
-# 📊 Step 3: Load (Visualize) - Show the distribution as a bar chart
-sns.set(style="whitegrid")
-plt.figure(figsize=(8, 5))
+# For df2: Convert to datetime (change from DD/MM/YYYY to YYYY-MM-DD)
+df2['Date'] = pd.to_datetime(df2['Date'], format='%d/%m/%Y')
 
-# Bar chart: x = class, y = number of cars
-sns.barplot(x='class', y='count', data=class_counts, palette='coolwarm')
+# Select only the common columns: Product, Sales, Region, and the standardized Date
+df1_transformed = df1[['Date', 'Product', 'Sales', 'Region']]
+df2_transformed = df2[['Date', 'Product', 'Sales', 'Region']]
 
-# Chart labels
-plt.title('Distribution of Car Evaluation Classes', fontsize=14)
-plt.xlabel('Car Evaluation Class')
-plt.ylabel('Number of Cars')
+# -------------------------------
+# ✅ L - Load Data
+# -------------------------------
 
-# Show the chart
-plt.show()
+# Merge the two datasets (on Date, Product, and Region) to combine the data
+merged_df = pd.concat([df1_transformed, df2_transformed], ignore_index=True)
+
+# Display the result (or load it to a CSV, database, etc.)
+merged_df.to_csv('merged_sales_data.csv', index=False)
+print("Data saved to merged_sales_data.csv")
+
+# Optionally, display the merged DataFrame
+print(merged_df.head())
